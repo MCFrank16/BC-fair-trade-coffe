@@ -8,7 +8,7 @@ contract('SupplyChain', function (accounts) {
     var sku = 1
     var upc = 1
     const ownerID = accounts[0]
-    const originFarmerID = accounts[1]
+    const originFarmerID = accounts[0]
     const originFarmName = "John Doe"
     const originFarmInformation = "Yarray Valley"
     const originFarmLatitude = "-38.239770"
@@ -17,9 +17,9 @@ contract('SupplyChain', function (accounts) {
     const productNotes = "Best beans for Espresso"
     const productPrice = web3.utils.toWei('1', "ether")
     var itemState = 0
-    const distributorID = accounts[2]
-    const retailerID = accounts[3]
-    const consumerID = accounts[4]
+    const distributorID = accounts[1]
+    const retailerID = accounts[2]
+    const consumerID = accounts[3]
     const emptyAddress = '0x00000000000000000000000000000000000000'
 
     ///Available Accounts
@@ -37,10 +37,10 @@ contract('SupplyChain', function (accounts) {
 
     console.log("ganache-cli accounts used here...")
     console.log("Contract Owner: accounts[0] ", accounts[0])
-    console.log("Farmer: accounts[1] ", accounts[1])
-    console.log("Distributor: accounts[2] ", accounts[2])
-    console.log("Retailer: accounts[3] ", accounts[3])
-    console.log("Consumer: accounts[4] ", accounts[4])
+    console.log("Farmer: accounts[1] ", accounts[0])
+    console.log("Distributor: accounts[2] ", accounts[1])
+    console.log("Retailer: accounts[3] ", accounts[2])
+    console.log("Consumer: accounts[4] ", accounts[3])
 
     // 1st Test
     it("Testing smart contract function harvestItem() that allows a farmer to harvest coffee", async () => {
@@ -94,7 +94,6 @@ contract('SupplyChain', function (accounts) {
     it("Testing smart contract function packItem() that allows a farmer to pack coffee", async () => {
         const supplyChain = await SupplyChain.deployed()
 
-
         // Mark an item as Packed by calling function packItem()
         const packItemTx = await supplyChain.packItem(upc, { from: originFarmerID })
 
@@ -144,9 +143,12 @@ contract('SupplyChain', function (accounts) {
     it("Testing smart contract function buyItem() that allows a distributor to buy coffee", async () => {
         const supplyChain = await SupplyChain.deployed()
 
+        // adding the distributor
+        await supplyChain.addDistributor(distributorID);
+
         // Mark an item as Sold by calling function buyItem()
 
-        const buyItemTx = await supplyChain.buyItem(upc, { from: distributorID, value: web3.utils.toWei('.05', "ether")})
+        const buyItemTx = await supplyChain.buyItem(upc, { from: distributorID, value: web3.utils.toWei('.03', "ether") })
 
 
         // Retrieve the just now saved item from blockchain by calling function fetchItem()
@@ -164,7 +166,7 @@ contract('SupplyChain', function (accounts) {
         assert.equal(resultBufferOne[7], originFarmLongitude, 'Error: Missing or Invalid originFarmLongitude')
         assert.equal(resultBufferTwo[4], web3.utils.toWei('.01', "ether"), 'Error: Invalid item Price')
         assert.equal(resultBufferTwo[5], 4, 'Error: Invalid item State')
-        truffleAssert.eventEmitted(buyItemTx, "Sold", null, "Invalid event emitted"); 
+        truffleAssert.eventEmitted(buyItemTx, "Sold", null, "Invalid event emitted");
     })
 
     // 6th Test
@@ -189,15 +191,18 @@ contract('SupplyChain', function (accounts) {
         assert.equal(resultBufferOne[7], originFarmLongitude, 'Error: Missing or Invalid originFarmLongitude')
         assert.equal(resultBufferTwo[4], web3.utils.toWei('.01', "ether"), 'Error: Invalid item Price')
         assert.equal(resultBufferTwo[5], 5, 'Error: Invalid item State')
-        truffleAssert.eventEmitted(shipItemTx, "Shipped", null, "Invalid event emitted"); 
+        truffleAssert.eventEmitted(shipItemTx, "Shipped", null, "Invalid event emitted");
     })
 
     // 7th Test
     it("Testing smart contract function receiveItem() that allows a retailer to mark coffee received", async () => {
         const supplyChain = await SupplyChain.deployed()
 
+        // adding the retailer
+        await supplyChain.addRetailer(retailerID);
+
         // Mark an item as Sold by calling function buyItem()
-        const receiveItemTx = await supplyChain.receiveItem(upc, {from: retailerID })
+        const receiveItemTx = await supplyChain.receiveItem(upc, { from: retailerID })
 
         // Retrieve the just now saved item from blockchain by calling function fetchItem()
         const resultBufferOne = await supplyChain.fetchItemBufferOne.call(upc)
@@ -217,13 +222,16 @@ contract('SupplyChain', function (accounts) {
         assert.equal(resultBufferOne[7], originFarmLongitude, 'Error: Missing or Invalid originFarmLongitude')
         assert.equal(resultBufferTwo[4], web3.utils.toWei('.01', "ether"), 'Error: Invalid item Price')
         assert.equal(resultBufferTwo[5], 6, 'Error: Invalid item State')
-        truffleAssert.eventEmitted(receiveItemTx, "Received", null, "Invalid event emitted"); 
+        truffleAssert.eventEmitted(receiveItemTx, "Received", null, "Invalid event emitted");
 
     })
 
     // 8th Test
     it("Testing smart contract function purchaseItem() that allows a consumer to purchase coffee", async () => {
         const supplyChain = await SupplyChain.deployed()
+
+        // adding the retailer
+        await supplyChain.addConsumer(consumerID);
 
 
         // Mark an item as Purchased by calling function purchaseItem()

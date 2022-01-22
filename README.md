@@ -19,4 +19,4 @@ node v12.16.1
 web3 v1.2.1
 
 ## Supply Chain Contract address
-[0x27E92fA061a4746A7b009C67C9e4517B2B918b08](https://rinkeby.etherscan.io/address/0x27E92fA061a4746A7b009C67C9e4517B2B918b08)
+[0x57044c149892EF739a4Ee45D428448c0aFB310e9](https://rinkeby.etherscan.io/address/0x57044c149892EF739a4Ee45D428448c0aFB310e9)

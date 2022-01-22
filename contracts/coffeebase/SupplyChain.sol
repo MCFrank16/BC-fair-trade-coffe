@@ -195,7 +195,7 @@ contract SupplyChain is
         string memory _originFarmLatitude,
         string memory _originFarmLongitude,
         string memory _productNotes
-    ) public {
+    ) public onlyFarmer {
         items[_upc] = Item(
             sku,
             _upc,
@@ -224,6 +224,7 @@ contract SupplyChain is
         public
         // call modifier to check if upc has passed previous supply chain state
         harvested(_upc)
+        onlyFarmer
         // call modifier to verify call of this function
         verifyCaller(items[_upc].originFarmerID)
     {
@@ -239,6 +240,7 @@ contract SupplyChain is
         public
         // Call modifier to check if upc has passed previous supply chain stage
         processed(_upc)
+        onlyFarmer
         // Call modifier to verify caller of this function
         verifyCaller(items[_upc].originFarmerID)
     {
@@ -253,6 +255,7 @@ contract SupplyChain is
         public
         // Call modifier to check if upc has passed previous supply chain stage
         packed(_upc)
+        onlyFarmer
         // Call modifier to verify caller of this function
         verifyCaller(items[_upc].originFarmerID)
     {
@@ -271,6 +274,7 @@ contract SupplyChain is
         payable
         // Call modifier to check if upc has passed previous supply chain stage
         forSale(_upc)
+        onlyDistributor
         // Call modifer to check if buyer has paid enough
         paidEnough(items[_upc].productPrice)
         // Call modifer to send any excess ether back to buyer
@@ -293,6 +297,7 @@ contract SupplyChain is
         public
         // Call modifier to check if upc has passed previous supply chain stage
         sold(_upc)
+        onlyDistributor
         // Call modifier to verify caller of this function
         verifyCaller(items[_upc].originFarmerID)
     {
@@ -309,6 +314,7 @@ contract SupplyChain is
         // Call modifier to check if upc has passed previous supply chain stage
         shipped(_upc)
         // Access Control List enforced by calling Smart Contract / DApp
+        onlyRetailer
     {
         // Update the appropriate fields - ownerID, retailerID, itemState
         items[_upc].ownerID = msg.sender;
@@ -326,6 +332,7 @@ contract SupplyChain is
         // Call modifier to check if upc has passed previous supply chain stage
         received(_upc)
         // Access Control List enforced by calling Smart Contract / DApp
+        onlyConsumer
     {
         // Update the appropriate fields - ownerID, consumerID, itemState
         items[_upc].ownerID = msg.sender;
