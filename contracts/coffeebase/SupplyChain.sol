@@ -11,11 +11,9 @@ contract SupplyChain is
     FarmerRole,
     DistributorRole,
     RetailerRole,
-    ConsumerRole
+    ConsumerRole,
+    Ownable
 {
-    // Define 'owner'
-    address payable owner;
-
     // Define a variable called 'upc' for Universal Product Code (UPC)
     uint256 upc;
 
@@ -71,12 +69,6 @@ contract SupplyChain is
     event Shipped(uint256 upc);
     event Received(uint256 upc);
     event Purchased(uint256 upc);
-
-    // Define a modifer that checks to see if msg.sender == owner of the contract
-    modifier onlyOwner() {
-        require(msg.sender == owner, "You are not the contract owner");
-        _;
-    }
 
     // Define a modifer that verifies the Caller
     modifier verifyCaller(address _address) {
@@ -174,17 +166,17 @@ contract SupplyChain is
     // and set 'sku' to 1
     // and set 'upc' to 1
     constructor() public {
-        owner = payable(msg.sender);
+        // owner = payable(msg.sender);
         sku = 1;
         upc = 1;
     }
 
     // Define a function 'kill' if required
-    function kill() public {
-        if (msg.sender == owner) {
-            selfdestruct(owner);
-        }
-    }
+    // function kill() public {
+    //     if (msg.sender == owner) {
+    //         selfdestruct(owner);
+    //     }
+    // }
 
     // Define a function 'harvestItem' that allows a farmer to mark an item 'Harvested'
     function harvestItem(
